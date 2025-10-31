@@ -1,8 +1,8 @@
 package org.example.Services;
 
 import org.example.Factories.CandidateFactory;
-import org.example.Menus.MainMenu;
 import org.example.Repositories.CandidateRepository;
+import org.example.Menus.MainMenu;
 
 public class InitializerService {
     private final CandidateRepository candidateRepository = CandidateRepository.getInstance();
