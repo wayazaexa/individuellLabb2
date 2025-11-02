@@ -7,9 +7,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class FilterByTrade implements IFilter<String> {
-    private final CandidateRepository candidateRepository = CandidateRepository.getInstance();
-    private final Logger log = LoggerFactory.getLogger(FilterByTrade.class);
+/**
+ * Filters candidates by trade name.
+ * Uses dependency injection for easier testing.
+ */
+public record FilterByTrade(CandidateRepository candidateRepository, Logger log) implements IFilter<String> {
+    public FilterByTrade() {
+        this(CandidateRepository.getInstance(), LoggerFactory.getLogger(FilterByTrade.class));
+    }
 
     @Override
     public List<Candidate> filter(String filterBy) {

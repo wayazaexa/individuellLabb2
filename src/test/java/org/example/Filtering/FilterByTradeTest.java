@@ -2,8 +2,8 @@ package org.example.Filtering;
 
 import org.example.Models.Candidate;
 import org.example.Repositories.CandidateRepository;
-import org.junit.jupiter.api.*;
-import org.mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -13,59 +13,44 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link FilterByTrade}.
+ * Unit tests for {@link FilterByTrade} (dependency-injected version).
  */
 class FilterByTradeTest {
 
-    @Mock
-    private CandidateRepository mockRepository;
-
-    @Mock
+    private CandidateRepository mockRepo;
     private Logger mockLogger;
-
-    @Mock
-    private Candidate carpenter;
-
-    @Mock
-    private Candidate electrician;
-
     private FilterByTrade filter;
+
+    private Candidate carpenter;
+    private Candidate electrician;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        mockRepo = mock(CandidateRepository.class);
+        mockLogger = mock(Logger.class);
 
-        // Stub candidates
+        carpenter = mock(Candidate.class);
+        electrician = mock(Candidate.class);
+
         when(carpenter.getTrade()).thenReturn("Carpenter");
         when(electrician.getTrade()).thenReturn("Electrician");
 
-        // Mock repository data
-        when(mockRepository.getCandidates()).thenReturn(
-                Map.of(
-                        1, carpenter,
-                        2, electrician
-                )
-        );
+        when(mockRepo.getCandidates()).thenReturn(Map.of(
+                1, carpenter,
+                2, electrician
+        ));
 
-        // Inject mocks by subclassing FilterByTrade for test
-        filter = new FilterByTrade() {
-            @Override
-            public List<Candidate> filter(String filterBy) {
-                // override to use mock repository + mock logger
-                mockLogger.info("Candidate list filtered by trade: {}", filterBy);
-                return mockRepository.getCandidates().values().stream()
-                        .filter(candidate -> candidate.getTrade().equalsIgnoreCase(filterBy))
-                        .toList();
-            }
-        };
+        filter = new FilterByTrade(mockRepo, mockLogger);
     }
 
     @Test
-    void testFilter_ReturnsCandidatesMatchingTrade() {
+    void testFilter_ReturnsMatchingTrade() {
         List<Candidate> result = filter.filter("Carpenter");
 
         assertEquals(1, result.size());
         assertSame(carpenter, result.get(0));
+
+        verify(mockLogger).info("Candidate list filtered by trade: {}", "Carpenter");
     }
 
     @Test
@@ -74,20 +59,16 @@ class FilterByTradeTest {
 
         assertEquals(1, result.size());
         assertSame(electrician, result.get(0));
+
+        verify(mockLogger).info("Candidate list filtered by trade: {}", "eLeCtRiCiAn");
     }
 
     @Test
-    void testFilter_NoMatch_ReturnsEmptyList() {
+    void testFilter_NoMatches_ReturnsEmptyList() {
         List<Candidate> result = filter.filter("Plumber");
 
         assertTrue(result.isEmpty());
-    }
 
-    @Test
-    void testFilter_LogsFilteringAction() {
-        // Call filter and verify log interaction
-        filter.filter("Carpenter");
-
-        verify(mockLogger, atLeastOnce()).info("Candidate list filtered by trade: {}", "Carpenter");
+        verify(mockLogger).info("Candidate list filtered by trade: {}", "Plumber");
     }
 }

@@ -81,3 +81,91 @@ Filtering returns the expected candidates,
 Logging occurs correctly, and
 
 Filtering is case-insensitive.
+
+```
+*after spitting out a test suite and reminders about the pom.xml, it also gave me a suggestion about refactoring
+which I didn't notice until I gave it my FilterByExperience-class in the same manner*
+```
+Optional refactor suggestion
+
+To make this class easier to test (without subclassing):
+
+Inject CandidateRepository and Logger through the constructor.
+Then your tests can pass mocks directly instead of subclassing.
+
+Would you like me to show what that small refactor would look like (it keeps the same production behavior but makes it much cleaner to test)?
+
+* Yes, please.
+
+Excellent — refactoring for dependency injection is one of the best moves you can make for testability ✅
+
+Your current FilterByExperience class directly calls:
+```java
+CandidateRepository.getInstance();
+LoggerFactory.getLogger(FilterByExperience.class);
+```
+
+That makes it hard to test because it’s tied to static singletons.
+Let’s make it cleaner, without changing its behavior for production code.
+
+✅ Refactored FilterByExperience (dependency-injected version)
+```java
+package org.example.Filtering;
+
+import org.example.Models.Candidate;
+import org.example.Repositories.CandidateRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+
+/**
+ * Filters candidates by minimum years of work experience.
+ * Uses dependency injection for easier testing.
+ */
+public class FilterByExperience implements IFilter<Integer> {
+
+    private final CandidateRepository candidateRepository;
+    private final Logger log;
+
+    // Default constructor for normal app use
+    public FilterByExperience() {
+        this(CandidateRepository.getInstance(), LoggerFactory.getLogger(FilterByExperience.class));
+    }
+
+    // Constructor for testing / DI frameworks
+    public FilterByExperience(CandidateRepository candidateRepository, Logger log) {
+        this.candidateRepository = candidateRepository;
+        this.log = log;
+    }
+
+    @Override
+    public List<Candidate> filter(Integer filterBy) {
+        log.info("Candidate list filtered by years of work experience >= {}", filterBy);
+        return candidateRepository.getCandidates().values().stream()
+                .filter(candidate -> candidate.getYearsOfWorkExperience() >= filterBy)
+                .toList();
+    }
+}
+```
+What changed
+
+| Before                                     | 	After                   |
+|--------------------------------------------|--------------------------|
+| CandidateRepository created internally	    | Injected via constructor |
+| LoggerFactory.getLogger(...) inside class	 | Injected via constructor |
+|Needed static mocking in tests|	No static mocking needed — pass mocks directly|
+|Harder to reuse / test	|Fully testable and dependency-injection–friendly|
+
+```
+*It then gave me the updated test class, a short explanation about why this approach is better,
+and asked if I wanted it to refactor FilterByTrade in the same DI-style and show matching tests.
+I answered yes, please yet again and was given the updated FilterByTrade and tests for it*
+```
+
+## Final Thoughts
+
+While using AI can give more of a headache than it solves, as long as you give it clear instructions and double-check
+its proposed solution, it can greatly cut time spent generating boilerplate code. It can even be helpful with coding
+style for junior developers, making sure our code is more up to general coding standards (at the time it was trained,
+but for a beginners course, that's plenty enough).

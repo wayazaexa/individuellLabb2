@@ -7,9 +7,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class FilterByExperience implements IFilter<Integer> {
-    private final CandidateRepository candidateRepository = CandidateRepository.getInstance();
-    private final Logger log = LoggerFactory.getLogger(FilterByExperience.class);
+/**
+ * Filters candidates by minimum years of work experience.
+ * Uses dependency injection for easier testing.
+ */
+public record FilterByExperience(CandidateRepository candidateRepository, Logger log) implements IFilter<Integer> {
+    public FilterByExperience() {
+        this(CandidateRepository.getInstance(), LoggerFactory.getLogger(FilterByExperience.class));
+    }
 
     @Override
     public List<Candidate> filter(Integer filterBy) {

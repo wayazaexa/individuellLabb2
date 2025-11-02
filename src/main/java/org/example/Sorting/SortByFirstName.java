@@ -8,9 +8,10 @@ import org.slf4j.LoggerFactory;
 import java.util.Comparator;
 import java.util.List;
 
-public class SortByFirstName implements ISort {
-    private final CandidateRepository candidateRepository = CandidateRepository.getInstance();
-    private final Logger log = LoggerFactory.getLogger(SortByFirstName.class);
+public record SortByFirstName(CandidateRepository candidateRepository, Logger log) implements ISort {
+    public SortByFirstName() {
+        this(CandidateRepository.getInstance(), LoggerFactory.getLogger(SortByFirstName.class));
+    }
 
     @Override
     public List<Candidate> sort() {
