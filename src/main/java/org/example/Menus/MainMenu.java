@@ -3,11 +3,8 @@ package org.example.Menus;
 import org.example.Factories.CandidateFactory;
 import org.example.Repositories.CandidateRepository;
 
-import java.util.Scanner;
-
 public class MainMenu extends Menu {
     CandidateRepository candidateRepository = CandidateRepository.getInstance();
-    private final Scanner scanner = new Scanner(System.in);
 
     public void start() {
         while (true) {
