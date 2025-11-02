@@ -7,6 +7,12 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This relates to most if not all classes, but I had to pick one to write about so here we are.
+ * This class's sole responsibility is storing the list of candidates and a couple of methods to present said list,
+ * add to it, and remove from it. This is in accordance with the Single Responsibility principle of SOLID, and ensures
+ * that the code base is organized, easy to test, and not tightly coupled.
+ */
 public class CandidateRepository {
     private final Map<Integer, Candidate> candidates = new HashMap<>();
     private static CandidateRepository instance;

@@ -2,6 +2,11 @@ package org.example.Menus;
 
 import java.util.Scanner;
 
+/**
+ * Splitting up the menus into a main class with two classes that extends from it to implement their functionality was
+ * my attempt at fulfilling the Open-Closed Principle of SOLID. The more I wrote it the less it felt like it made sense
+ * to do it this way though, so I'm not very happy about how this ended up.
+ */
 public class Menu {
     final Scanner scanner = new Scanner(System.in);
 
